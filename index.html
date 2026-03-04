@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monir Ludo</title>
+<style>
+body{font-family:Arial;text-align:center;background:#f0f0f0;margin:0}
+h2{margin:10px 0}
+#board{width:95vw;max-width:420px;margin:10px auto;display:grid;
+grid-template-columns:repeat(11,1fr);gap:2px}
+.cell{background:#fff;border:1px solid #ccc;aspect-ratio:1}
+.safe{background:#e0e0e0}
+.path{background:#fafafa}
+.homeR{background:#ffcccc}
+.homeG{background:#ccffcc}
+.homeB{background:#cce0ff}
+.homeY{background:#fff5cc}
+.token{width:70%;height:70%;border-radius:50%;margin:auto;margin-top:15%}
+.red{background:red}
+.green{background:green}
+.blue{background:blue}
+.yellow{background:gold}
+#panel{margin:10px}
+button{padding:10px 18px;font-size:16px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<h2>🔥 Monir Full Ludo</h2>
+<div id="turnInfo">Turn: Red</div>
+<div id="board"></div>
+<div id="panel">
+<h3 id="diceText">Roll Dice</h3>
+<button onclick="rollDice()">🎲 Roll</button>
+</div>
+
+<script>
+const board=document.getElementById("board");
+const turnInfo=document.getElementById("turnInfo");
+const diceText=document.getElementById("diceText");
+
+const players=["red","green","blue","yellow"];
+let currentPlayer=0;
+let diceValue=0;
+
+let positions={
+red:[-1,-1,-1,-1],
+green:[-1,-1,-1,-1],
+blue:[-1,-1,-1,-1],
+yellow:[-1,-1,-1,-1]
+};
+
+const pathLength=40;
+
+function createBoard(){
+for(let i=0;i<121;i++){
+let div=document.createElement("div");
+div.classList.add("cell");
+div.classList.add("path");
+board.appendChild(div);
+}
+}
+createBoard();
+
+function rollDice(){
+diceValue=Math.floor(Math.random()*6)+1;
+diceText.innerText="Dice: "+diceValue;
+moveToken();
+}
+
+function moveToken(){
+let player=players[currentPlayer];
+for(let i=0;i<4;i++){
+if(positions[player][i]==-1 && diceValue==6){
+positions[player][i]=0;
+render();
+nextTurn(diceValue==6);
+return;
+}
+else if(positions[player][i]>=0){
+positions[player][i]+=diceValue;
+if(positions[player][i]>=pathLength){
+alert(player.toUpperCase()+" Wins! 🏆");
+resetGame();
+return;
+}
+render();
+nextTurn(diceValue==6);
+return;
+}
+}
+nextTurn(false);
+}
+
+function nextTurn(extra){
+if(!extra){
+currentPlayer=(currentPlayer+1)%4;
+}
+turnInfo.innerText="Turn: "+players[currentPlayer].toUpperCase();
+}
+
+function render(){
+document.querySelectorAll(".token").forEach(e=>e.remove());
+players.forEach(player=>{
+positions[player].forEach(pos=>{
+if(pos>=0 && pos<121){
+let cell=board.children[pos];
+let token=document.createElement("div");
+token.classList.add("token",player);
+cell.appendChild(token);
+}
+});
+});
+}
+
+function resetGame(){
+players.forEach(p=>{
+positions[p]=[-1,-1,-1,-1];
+});
+currentPlayer=0;
+render();
+turnInfo.innerText="Turn: RED";
+diceText.innerText="Roll Dice";
+}
+</script>
+
+</body>
+</html>
